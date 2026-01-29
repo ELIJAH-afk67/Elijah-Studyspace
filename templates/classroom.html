@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ classroom.name }} <small class="text-muted">by {{ classroom.teacher_name }}</small></h2>
+<p><strong>Visibility:</strong> {{ classroom.visibility }}</p>
+
+<div class="row">
+  <div class="col-md-8">
+    <h4>Announcements</h4>
+    {% if classroom.announcements %}
+      <ul class="list-group mb-3">
+        {% for a in classroom.announcements %}
+          <li class="list-group-item">{{ a.text }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No announcements yet.</p>
+    {% endif %}
+
+    {% if user.role == "Teacher" and user.name == classroom.teacher_name %}
+      <form method="post">
+        <input type="hidden" name="action" value="post_announcement">
+        <div class="mb-2"><textarea class="form-control" name="announcement" placeholder="Write announcement..." required></textarea></div>
+        <button class="btn btn-secondary">Post Announcement</button>
+      </form>
+      <hr>
+    {% endif %}
+
+    <h4>Lessons</h4>
+    {% if classroom.lessons %}
+      {% for l in classroom.lessons %}
+        <div class="card mb-2">
+          <div class="card-body">
+            <h5>{{ l.title }}</h5>
+            <p>{{ l.body }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No lessons yet.</p>
+    {% endif %}
+
+    {% if user.role == "Teacher" and user.name == classroom.teacher_name %}
+      <form method="post">
+        <input type="hidden" name="action" value="post_lesson">
+        <div class="mb-2"><input class="form-control" name="lesson_title" placeholder="Lesson title" required></div>
+        <div class="mb-2"><textarea class="form-control" name="lesson_body" placeholder="Lesson content" required></textarea></div>
+        <button class="btn btn-secondary">Post Lesson</button>
+      </form>
+      <hr>
+    {% endif %}
+
+    <h4>Assignments</h4>
+    {% if classroom.assignments %}
+      {% for a in classroom.assignments %}
+        <div class="card mb-2">
+          <div class="card-body">
+            <h5>{{ a.title }}</h5>
+            <p>{{ a.desc }}</p>
+            {% if a.submissions %}
+              <p><strong>Submissions:</strong></p>
+              <ul>
+                {% for s in a.submissions %}
+                  <li>{{ s.student }}: {{ s.text }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+            {% if classroom.visibility == "Private" and (classroom.teacher_name == user.name or class_id in user.joined) %}
+              <form method="post">
+                <input type="hidden" name="action" value="submit_assignment">
+                <input type="hidden" name="assignment_idx" value="{{ loop.index0 }}">
+                <div class="mb-2"><textarea class="form-control" name="submission_text" placeholder="Your submission"></textarea></div>
+                <button class="btn btn-primary btn-sm">Submit Assignment</button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No assignments yet.</p>
+    {% endif %}
+
+    {% if user.role == "Teacher" and user.name == classroom.teacher_name and classroom.visibility == "Private" %}
+      <form method="post">
+        <input type="hidden" name="action" value="post_assignment">
+        <div class="mb-2"><input class="form-control" name="assignment_title" placeholder="Assignment title" required></div>
+        <div class="mb-2"><textarea class="form-control" name="assignment_desc" placeholder="Assignment description" required></textarea></div>
+        <button class="btn btn-secondary">Post Assignment</button>
+      </form>
+    {% endif %}
+  </div>
+
+  <div class="col-md-4">
+    <h5>Classroom Info</h5>
+    <p><strong>Teacher:</strong> {{ classroom.teacher_name }}<br>
+    <strong>Visibility:</strong> {{ classroom.visibility }}</p>
+
+    {% if classroom.visibility == "Private" %}
+      <p><strong>Private classroom.</strong></p>
+      {% if user.role == "Teacher" and user.name == classroom.teacher_name %}
+        <p>Join code: <strong>{{ classroom.code }}</strong></p>
+      {% endif %}
+    {% endif %}
+
+    <a class="btn btn-outline-primary" href="{{ url_for('public_directory') }}">Back to Directory</a>
+  </div>
+</div>
+{% endblock %}
