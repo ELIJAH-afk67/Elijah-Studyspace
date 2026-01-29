@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Teacher Dashboard</h2>
+<p>Create and manage your classrooms here.</p>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <h5>Create Classroom</h5>
+    <form method="post" action="{{ url_for('create_classroom') }}">
+      <div class="mb-2">
+        <input class="form-control" name="classroom_name" placeholder="Classroom name" required>
+      </div>
+      <div class="mb-2">
+        <select class="form-select" name="visibility">
+          <option value="Private">Private (invite by code)</option>
+          <option value="Public">Public (visible to everyone)</option>
+        </select>
+      </div>
+      <button class="btn btn-primary">Create Classroom</button>
+    </form>
+  </div>
+</div>
+
+<h4>Your Classrooms</h4>
+{% if classrooms %}
+  <div class="list-group">
+    {% for c in classrooms %}
+      <div class="list-group-item">
+        <h5>{{ c.name }} <small class="text-muted">({{ c.visibility }})</small></h5>
+        <p>Link: <a href="{{ url_for('classroom_page', class_id=c.id) }}">{{ url_for('classroom_page', class_id=c.id, _external=true) }}</a></p>
+        {% if c.visibility == "Private" %}
+          <p>Join code: <strong>{{ c.code }}</strong></p>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>You haven't created any classrooms yet.</p>
+{% endif %}
+{% endblock %}
