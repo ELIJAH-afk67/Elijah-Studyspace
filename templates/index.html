@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Welcome to Studyspace</h1>
+<p class="lead">A lightweight classroom platform for teachers and students — public or private classrooms.</p>
+
+<div class="row">
+  <div class="col-md-8">
+    <h3>Featured Public Classrooms</h3>
+    {% if featured %}
+      <div class="list-group">
+        {% for c in featured %}
+          <a class="list-group-item list-group-item-action" href="{{ url_for('classroom_page', class_id=c.id) }}">
+            <strong>{{ c.name }}</strong> — Teacher: {{ c.teacher_name }}
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p>No public classrooms yet. Teachers, create one from your dashboard.</p>
+    {% endif %}
+  </div>
+
+  <div class="col-md-4">
+    <h5>Join Private Classroom</h5>
+    <form method="post" action="{{ url_for('join_classroom') }}">
+      <div class="mb-2"><input class="form-control" name="code" placeholder="Enter 6-digit code"></div>
+      <button class="btn btn-primary">Join</button>
+    </form>
+
+    <hr>
+    <h6>Quick Links</h6>
+    <ul>
+      <li><a href="{{ url_for('public_directory') }}">Browse all public classrooms</a></li>
+      <li><a href="{{ url_for('login') }}">Login / Signup (Teacher or Student)</a></li>
+    </ul>
+  </div>
+</div>
+{% endblock %}
