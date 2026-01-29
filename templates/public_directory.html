@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Public Classrooms</h2>
+{% if classrooms %}
+  <div class="list-group">
+    {% for c in classrooms %}
+      <a class="list-group-item list-group-item-action" href="{{ url_for('classroom_page', class_id=c.id) }}">
+        <strong>{{ c.name }}</strong> — Teacher: {{ c.teacher_name }}
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>No public classrooms yet.</p>
+{% endif %}
+{% endblock %}
